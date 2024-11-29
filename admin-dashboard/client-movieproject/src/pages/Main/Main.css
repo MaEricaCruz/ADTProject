@@ -1,0 +1,94 @@
+.Main {
+  display: flex;
+  overflow: hidden;
+  max-height: 100vh;
+}
+.Main .container {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+}
+.Main .container .outlet {
+  flex-grow: 3;
+  padding: 1rem;
+  overflow-y: auto;
+}
+.Main .container .navigation {
+  height: 80px;
+  background-color: #15171b;
+  width: 100%;
+}
+.Main .container .navigation ul {
+  list-style: none;
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+  display: flex;
+}
+
+.Main .container .navigation ul li {
+  padding: 0px 60px;
+  height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #61dafb;
+  font-weight: bold;
+}
+.Main .container .navigation ul li a {
+  text-decoration: none;
+  color: #61dafb;
+}
+.Main .container .navigation ul li.active a,
+.Main .container .navigation ul li:hover a {
+  text-decoration: none;
+  color: white;
+}
+.Main .container .navigation ul li.active,
+.Main .container .navigation ul li:hover {
+  background: #353a43;
+}
+.Main .container .navigation ul li a {
+  text-decoration: none;
+}
+
+.Main .container .navigation ul li.logout,
+.Main .container .navigation ul li.login {
+  cursor: pointer;
+  justify-self: end;
+}
+.dropdown-menu {
+  display: grid; /* Use grid layout for multiple columns */
+  grid-template-columns: 1fr 1fr 1fr; /* Two equal-width columns */
+  gap: 10px; /* Add spacing between columns */
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #333;
+  width: 500px; /* Adjust the overall width of the dropdown */
+  padding: 10px; /* Add padding for aesthetics */
+  list-style-type: none;
+  margin: 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  z-index: 10; /* Ensure it appears above other elements */
+}
+
+.dropdown-menu li {
+  padding: 5px; /* Reduce padding for compactness */
+}
+
+.dropdown-menu li a {
+  color: white;
+  text-decoration: none;
+  display: block;
+  font-size: 16px; /* Adjust text size if needed */
+  transition: background-color 0.3s;
+}
+
+.dropdown-menu li a:hover {
+  background-color: #444; /* Highlight on hover */
+}
+
