@@ -1,0 +1,22 @@
+.cast-crew-page {
+  padding: 20px;
+}
+
+.cast-crew-page h1 {
+  font-size: 24px;
+  margin-bottom: 15px;
+}
+
+.cast-crew-page ul {
+  list-style: none;
+  padding: 0;
+}
+
+.cast-crew-page li {
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.cast-crew-page p {
+  margin: 0;
+}

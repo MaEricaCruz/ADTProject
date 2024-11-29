@@ -1,0 +1,119 @@
+.lists-container {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background-color: #f2f2f2;
+  border-radius: 8px;
+  max-width: 100000px;
+  margin: 20px auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+.create-container button {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.create-container button:hover {
+  background-color: #45a049;
+}
+
+.table-container {
+  margin-top: 20px;
+  overflow-x: auto;
+}
+
+.movie-lists {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: rgb(105, 91, 91);
+}
+
+.movie-lists th, .movie-lists td {
+  text-align: center;
+  padding: 10px;
+  border: 1px solid #535353; /**/
+}
+
+.movie-lists th {
+  background-color: #f9f9f9;
+  color: #333;
+  font-weight: bold;
+}
+
+.movie-lists tr:nth-child(even) {
+  background-color: #72a55e;
+}
+
+.movie-lists tr:hover {
+  background-color: #0ee918;
+}
+
+
+.movie-lists button {
+  padding: 5px 10px;
+  margin: 0 5px;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.movie-lists button[type='button'] {
+  background-color: #0fc445;
+  color: white;
+}
+
+.movie-lists button[type='button']:hover {
+  background-color: #30d43d;
+}
+
+.movie-lists button[type='button']:last-child {
+  background-color: #f44336;
+  color: white;
+}
+
+.movie-lists button[type='button']:last-child:hover {
+  background-color: #d32f2f;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.pagination button {
+  background-color: #1cb40f;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.pagination button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #4caf50;
+}
+
+.pagination span {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}
