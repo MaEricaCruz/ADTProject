@@ -9,16 +9,17 @@ const Home = () => {
   const navigate = useNavigate();
   const [featuredMovie, setFeaturedMovie] = useState(null);
   const { movieList, setMovieList, setMovie } = useMovieContext();
+  const [trailerKey, setTrailerKey] = useState(null); 
+  const [isModalOpen, setIsModalOpen] = useState(false); 
 
-
+ 
   const getMovies = () => {
     axios
-      .get('/movies') 
+      .get('/movies')
       .then((response) => {
         const movies = response.data;
         setMovieList(movies);
 
-        
         if (movies.length) {
           const random = Math.floor(Math.random() * movies.length);
           setFeaturedMovie(movies[random]);
@@ -27,11 +28,39 @@ const Home = () => {
       .catch((error) => console.error('Failed to fetch movies:', error));
   };
 
+  const watchTrailer = async (movieId) => {
+    try {
+      const response = await axios.get(
+        `https://api.themoviedb.org/3/movie/${movieId}/videos`,
+        {
+          params: {
+            api_key: '013044f24bc916f73380c8a21b491d6b', // TMDB API key
+            language: 'en-US',
+          },
+        }
+      );
+      const trailers = response.data.results;
+      const trailer = trailers.find((vid) => vid.type === 'Trailer' && vid.site === 'YouTube');
+      if (trailer) {
+        setTrailerKey(trailer.key); 
+        setIsModalOpen(true); 
+      } else {
+        alert('No trailer available for this movie.');
+      }
+    } catch (error) {
+      console.error('Error fetching trailer:', error);
+      alert('Failed to fetch the trailer. Please try again later.');
+    }
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setTrailerKey(null);
+  };
 
   useEffect(() => {
     getMovies();
   }, []);
-
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -45,51 +74,80 @@ const Home = () => {
 
   return (
     <div className="main-container">
-    {featuredMovie && (
-  <div
-    className="featured-backdrop"
-    style={{
-      backgroundImage: `url(${
-        featuredMovie.backdropPath
-          ? `https://image.tmdb.org/t/p/original/${featuredMovie.backdropPath}`
-          : featuredMovie.posterPath || 'placeholder-backdrop.jpg'
-      })`,
-    }}
-  >
-    <div className="movie-details">
-      <h1 className="featured-movie-title">{featuredMovie.title}</h1>
-      <p className="movie-info">
-        {`HD | ${featuredMovie.releaseDate ? new Date(featuredMovie.releaseDate).getFullYear()  : 'N/A' }| ${featuredMovie.voteAverage.toFixed(1)  || 'N/A' }`}</p>
-  
-      <p className="movie-description">{featuredMovie.overview || 'No description available.'}</p>
-      <button
-        className="watch-now-button"
-        onClick={() => navigate(`/movies/${featuredMovie.id}`)}
-      >
-        Watch Now
-      </button>
-    </div>
-  </div>
-)}
+      {featuredMovie && (
+        <div
+          className="featured-backdrop"
+          style={{
+            backgroundImage: `url(${
+              featuredMovie.backdropPath
+                ? `https://image.tmdb.org/t/p/original/${featuredMovie.backdropPath}`
+                : featuredMovie.posterPath || 'placeholder-backdrop.jpg'
+            })`,
+          }}
+        >
+          <div className="movie-details">
+            <h1 className="featured-movie-title">{featuredMovie.title}</h1>
+            <p className="movie-info">
+              {`HD | ${
+                featuredMovie.releaseDate
+                  ? new Date(featuredMovie.releaseDate).getFullYear()
+                  : 'N/A'
+              } | ${featuredMovie.voteAverage.toFixed(1) || 'N/A'}`}
+            </p>
 
-<p className="page-title">Trending Movies</p>
-{movieList && movieList.length ? (
-  <div className="list-container">
-    {movieList.map((movie) => (
-      <MovieCards
-        key={movie.id}
-        movie={movie}
-        onClick={() => {
-          navigate(`/movies/${movie.id}`);
-          setMovie(movie);
-        }}
-      />
-    ))}
-  </div>
-) : (
-  <div>Loading movies...</div>
-)}
+            <p className="movie-description">{featuredMovie.overview || 'No description available.'}</p>
 
+            <button
+              className="watch-now-button"
+              onClick={() => navigate(`/movies/${featuredMovie.id}`)}
+            >
+              Watch Now
+            </button>
+            <button
+              className="watch-trailer-button"
+              onClick={() => watchTrailer(featuredMovie.tmdbId || featuredMovie.id)}
+            >
+              Watch Trailer
+            </button>
+          </div>
+        </div>
+      )}
+
+      <p className="page-title">Trending Movies</p>
+      {movieList && movieList.length ? (
+        <div className="list-container">
+          {movieList.map((movie) => (
+            <MovieCards
+              key={movie.id}
+              movie={movie}
+              onClick={() => {
+                navigate(`/movies/${movie.id}`);
+                setMovie(movie);
+              }}
+            />
+          ))}
+        </div>
+      ) : (
+        <div>Loading movies...</div>
+      )}
+
+      {isModalOpen && trailerKey && (
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+            <button className="close-button" onClick={closeModal}>
+              ×
+            </button>
+            <iframe
+              src={`https://www.youtube.com/embed/${trailerKey}`}
+              width="560"
+              height="315"
+              title="YouTube Trailer"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

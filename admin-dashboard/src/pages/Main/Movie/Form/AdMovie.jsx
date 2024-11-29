@@ -1,23 +1,18 @@
 import axios from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
-import './Form.css';
+import './AdMovie.css';
 
-const Form = () => {
+const AdMovie = () => { 
   const [query, setQuery] = useState('');
   const [searchedMovieList, setSearchedMovieList] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(undefined);
-  const [selectedCasts, setSelectedCasts] = useState([]);
   const [formState, setFormState] = useState({
     title: '',
     overview: '',
     popularity: '',
     releaseDate: '',
-    voteAverage: '',
-    name: '',
-    characterName: '',
-    url: '',
-    description: ''
+    voteAverage: ''
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -39,28 +34,6 @@ const Form = () => {
           setSelectedMovie(movie);
         })
         .catch((error) => console.error(error));
-    }
-  }, [movieId]);
-
-  useEffect(() => {
-    if (movieId) {
-      axios.get(`/casts/${movieId}`)
-        .then((response) => {
-          const casts = response.data; // Assuming this is an array of cast members
-          setSelectedCasts(casts);
-          if (casts.length > 0) {
-            // This could be updated based on what data you want to set for the form
-            setFormState({
-              name: casts.name,
-              url: casts.url,
-              characterName: casts.characterName,
-              releaseDate: casts.releaseDate,
-            });
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching cast data:", error);
-        });
     }
   }, [movieId]);
 
@@ -113,18 +86,9 @@ const Form = () => {
     setSelectedMovie(movie);
   };
 
-  const handleSelectCasts = (cast) => {
-    // Set form state to show selected cast details for the form
-    setFormState({
-      name: cast.name,
-      url: cast.url,
-      characterName: cast.characterName,
-    });
-    setSelectedCasts([cast]); // Set the selected cast for further operations
-  };
-
   const handleSave = () => {
     const accessToken = localStorage.getItem('accessToken');
+
     if (!selectedMovie) {
       alert('Please search and select a movie.');
       return;
@@ -140,9 +104,6 @@ const Form = () => {
       backdropPath: `https://image.tmdb.org/t/p/original/${selectedMovie.backdrop_path}`,
       posterPath: `https://image.tmdb.org/t/p/original/${selectedMovie.poster_path}`,
       isFeatured: 0,
-      name: formState.name,
-      url: formState.url,
-      characterName: formState.characterName,
     };
 
     axios({
@@ -227,7 +188,6 @@ const Form = () => {
               alt="Movie poster"
             />
           )}
-
           <div className='field'>
             Title:
             <input
@@ -272,7 +232,7 @@ const Form = () => {
             <ul className='tabs'>
               <li
                 onClick={() => {
-                  navigate(`/main/movies/form/${movieId}/casts`);
+                  navigate(`/main/movies/form/${movieId}/cast-crew`);
                 }}
               >
                 Cast & Crews
@@ -295,11 +255,9 @@ const Form = () => {
           </nav>
         </form>
       </div>
-
       <button type='button' onClick={handleSave}>
         {movieId ? 'Update' : 'Save'}
       </button>
-
       <button
         type='button'
         onClick={() => {
@@ -310,15 +268,15 @@ const Form = () => {
       >
         Back
       </button>
-
       {movieId !== undefined && selectedMovie && (
         <div>
           <hr />
           <Outlet />
         </div>
+        
       )}
     </>
   );
 };
 
-export default Form;
+export default AdMovie;

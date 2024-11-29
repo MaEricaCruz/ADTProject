@@ -13,6 +13,7 @@ import Lists from './pages/Main/Movie/Lists/Lists';
 import Form from './pages/Main/Movie/Form/Form';
 import Home from './pages/Main/Movie/Home/Home';
 import CastCrew from './pages/Main/Movie/Lists/CastCrew';
+import AdMovie from './pages/Main/Movie/Form/AdMovie';
 
 
 const router = createBrowserRouter([
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
           {
             path: '/main/movies/form/:movieId?',
             element: <Form />,
+          },  
+          {
+            path: '/main/movies/form/AdMovie',
+            element: <AdMovie />,
           },  
           <Route path="/main/movies/form/:movieId/cast-crew" element={<CastCrew />} />
         ],

@@ -62,11 +62,12 @@ const Lists = () => {
 
   return (
     <div className='lists-container'>
+      <h1>Creating Movie</h1>
       <div className='create-container'>
         <button
           type='button'
           onClick={() => {
-            navigate('/main/movies/form');
+            navigate('/main/movies/form/AdMovie');
           }}
         >
          Add Movie
