@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Outlet, useNavigate, Link } from 'react-router-dom';
 import './Main.css';
 import Logo from '../../assets/Logo.png';
-import SearchIcon from '../../assets/Search-icon.png';
+
 
 function Main() {
   const accessToken = localStorage.getItem('accessToken');
@@ -34,7 +34,6 @@ function Main() {
             <li>
             <a href="/main/movies/home">Home</a>
             </li>
-
             <li>
             <a href="/main/movies">Movies</a>
             </li>

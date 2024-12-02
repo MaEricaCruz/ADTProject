@@ -1,0 +1,23 @@
+.cast-list {
+  margin: 20px 0;
+}
+
+.cast-image {
+  width: 100px;
+  height: 150px;
+  border-radius: 8px;
+}
+
+.cast-list ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.cast-list li {
+  display: flex;
+  margin-bottom: 15px;
+}
+
+.cast-list div {
+  margin-left: 10px;
+}

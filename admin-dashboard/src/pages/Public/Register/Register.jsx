@@ -83,7 +83,7 @@ function Register() {
 
   return (
     <div className="Login">
-      <div className="main-container">
+      <div className="mains-container">
         <form>
           <div className="form-container">
             <h1>Register</h1>
@@ -175,7 +175,7 @@ function Register() {
               {isFieldsDirty && !role && <span className="errors">*This field is required</span>}
             </div>
 
-            <div className="submit-container">
+            <div className="submit-containers">
               <button
                 type="button"
                 disabled={status === 'loading'}

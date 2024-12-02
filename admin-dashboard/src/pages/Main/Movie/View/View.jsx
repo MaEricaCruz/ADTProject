@@ -1,64 +1,85 @@
-import { useEffect } from 'react';
-import { useMovieContext } from '../../../../context/MovieContext';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import './View.css';
+import CastList from './Castlist';
+import Photolist from './Photolist';
+import VideoList from './VideoList';
 
-function View() {
-  const { movie, setMovie } = useMovieContext();
-
+const View = () => {
   const { movieId } = useParams();
-  const navigate = useNavigate();
-
+  const [item, setItem] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+ 
   useEffect(() => {
-    if (movieId !== undefined) {
-      axios
-        .get(`/movies/${movieId}`)
-        .then((response) => {
-          setMovie(response.data);
-        })
-        .catch((e) => {
-          console.log(e);
-          navigate('/');
-        });
+  const getView = async () => {
+    try {
+      const response = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}`, {
+        params: {
+          api_key: '013044f24bc916f73380c8a21b491d6b',
+          language: 'en-US',
+        },
+      });
+      console.log('Movie data:', response.data); // Check API response
+      setItem(response.data);
+      window.scrollTo(0, 0);
+    } catch (error) {
+      console.error('Failed to fetch movie details:', error);
+      setError('Failed to load movie details.');
+    } finally {
+      setLoading(false);
     }
-    return () => {};
-  }, [movieId]);
+  };
+
+  getView();
+}, [movieId]);
+
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  if (error) {
+    return <p>{error}</p>;
+  }
+
   return (
     <>
-      {movie && (
+      {item && (
         <>
-          <div>
-            <div className='banner'>
-              <h1>{movie.title}</h1>
+          <div
+            className="banner"
+            style={{
+              backgroundImage: `url(https://image.tmdb.org/t/p/original/${item.backdrop_path || item.poster_path})`,
+            }}
+          ></div>
+          <div className="movie-content__info">
+            <h1 className="title">{item.title || item.name}</h1>
+            <p className="overview">{item.overview}</p>
+            <div className="cast">
+              <div className="section__header">
+                <h2>Cast</h2>
+              </div>
+              <CastList movieId={movieId} />
             </div>
-            <h3>{movie.overview}</h3>
-            {JSON.stringify(movie)}
+            <div className="videos">
+     
+              <h3>Videos</h3>
+              </div>
+
+              <VideoList movieId={movieId} />
+            <div className="photo">
+   
+              <h3>Photos</h3>
+              </div>
+              <Photolist movieId={movieId} />
           </div>
 
-          {movie.casts && movie.casts.length && (
-            <div>
-              <h1>Cast & Crew</h1>
-              {JSON.stringify(movie.casts)}
-            </div>
-          )}
-
-          {movie.videos && movie.videos.length && (
-            <div>
-              <h1>Videos</h1>
-              {JSON.stringify(movie.videos)}
-            </div>
-          )}
-
-          {movie.photos && movie.photos.length && (
-            <div>
-              <h1>Photos</h1>
-              {JSON.stringify(movie.photos)}
-            </div>
-          )}
         </>
       )}
     </>
   );
-}
+};
 
 export default View;

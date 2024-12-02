@@ -2,17 +2,17 @@ import { useNavigate } from 'react-router-dom';
 import './Home.css';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import MovieCards from '../../../../components/MovieCards/MovieCards';
 import { useMovieContext } from '../../../../context/MovieContext';
+import MovieCards from '../../../../components/components/MovieCards';
 
 const Home = () => {
   const navigate = useNavigate();
   const [featuredMovie, setFeaturedMovie] = useState(null);
   const { movieList, setMovieList, setMovie } = useMovieContext();
-  const [trailerKey, setTrailerKey] = useState(null); 
-  const [isModalOpen, setIsModalOpen] = useState(false); 
+  const [trailerKey, setTrailerKey] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
- 
+  
   const getMovies = () => {
     axios
       .get('/movies')
@@ -42,8 +42,8 @@ const Home = () => {
       const trailers = response.data.results;
       const trailer = trailers.find((vid) => vid.type === 'Trailer' && vid.site === 'YouTube');
       if (trailer) {
-        setTrailerKey(trailer.key); 
-        setIsModalOpen(true); 
+        setTrailerKey(trailer.key);
+        setIsModalOpen(true);
       } else {
         alert('No trailer available for this movie.');
       }
@@ -72,6 +72,11 @@ const Home = () => {
     return () => clearInterval(interval);
   }, [movieList]);
 
+  const setSelectedMovie = (movie) => {
+    // Add logic for saving the movie to a database or state
+    console.log('Selected movie:', movie);
+  };
+
   return (
     <div className="main-container">
       {featuredMovie && (
@@ -84,6 +89,9 @@ const Home = () => {
                 : featuredMovie.posterPath || 'placeholder-backdrop.jpg'
             })`,
           }}
+          onClick={() => {
+            setSelectedMovie(featuredMovie);
+          }}
         >
           <div className="movie-details">
             <h1 className="featured-movie-title">{featuredMovie.title}</h1>
@@ -94,20 +102,19 @@ const Home = () => {
                   : 'N/A'
               } | ${featuredMovie.voteAverage.toFixed(1) || 'N/A'}`}
             </p>
-
-            <p className="movie-description">{featuredMovie.overview || 'No description available.'}</p>
+            <p className="movie-description">
+              {featuredMovie.overview || 'No description available.'}
+            </p>
 
             <button
-              className="watch-now-button"
-              onClick={() => navigate(`/movies/${featuredMovie.id}`)}
-            >
-              Watch Now
+               className="watch-now-button"
+               onClick={() => { console.log('Navigating to movie ID:', featuredMovie.tmdbId);
+               navigate(`/main/movies/view/${featuredMovie.tmdbId}`);}}>Watch Now
             </button>
+
             <button
               className="watch-trailer-button"
-              onClick={() => watchTrailer(featuredMovie.tmdbId || featuredMovie.id)}
-            >
-              Watch Trailer
+              onClick={() => watchTrailer(featuredMovie.tmdbId || featuredMovie.id)}>Watch Trailer
             </button>
           </div>
         </div>

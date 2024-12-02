@@ -3,26 +3,22 @@ import { useCallback, useEffect, useState } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import './Form.css';
 
+
 const Form = () => {
   const [query, setQuery] = useState('');
   const [searchedMovieList, setSearchedMovieList] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(undefined);
-  const [selectedCasts, setSelectedCasts] = useState([]);
   const [formState, setFormState] = useState({
     title: '',
     overview: '',
     popularity: '',
     releaseDate: '',
-    voteAverage: '',
-    name: '',
-    characterName: '',
-    url: '',
-    description: ''
+    voteAverage: ''
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
-  let { movieId } = useParams();
+  const { movieId } = useParams();
 
   useEffect(() => {
     if (movieId) {
@@ -34,33 +30,11 @@ const Form = () => {
             overview: movie.overview,
             popularity: movie.popularity,
             releaseDate: movie.releaseDate,
-            voteAverage: movie.voteAverage,
+            voteAverage: movie.voteAverage
           });
           setSelectedMovie(movie);
         })
         .catch((error) => console.error(error));
-    }
-  }, [movieId]);
-
-  useEffect(() => {
-    if (movieId) {
-      axios.get(`/casts/${movieId}`)
-        .then((response) => {
-          const casts = response.data; // Assuming this is an array of cast members
-          setSelectedCasts(casts);
-          if (casts.length > 0) {
-            // This could be updated based on what data you want to set for the form
-            setFormState({
-              name: casts.name,
-              url: casts.url,
-              characterName: casts.characterName,
-              releaseDate: casts.releaseDate,
-            });
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching cast data:", error);
-        });
     }
   }, [movieId]);
 
@@ -69,7 +43,7 @@ const Form = () => {
     try {
       const response = await axios.get('https://api.themoviedb.org/3/search/movie', {
         params: {
-          api_key: '013044f24bc916f73380c8a21b491d6b', // TMDB API key
+          api_key: '013044f24bc916f73380c8a21b491d6b',
           query,
           include_adult: false,
           language: 'en-US',
@@ -112,17 +86,6 @@ const Form = () => {
     });
     setSelectedMovie(movie);
   };
-
-  const handleSelectCasts = (cast) => {
-    // Set form state to show selected cast details for the form
-    setFormState({
-      name: cast.name,
-      url: cast.url,
-      characterName: cast.characterName,
-    });
-    setSelectedCasts([cast]); // Set the selected cast for further operations
-  };
-
   const handleSave = () => {
     const accessToken = localStorage.getItem('accessToken');
     if (!selectedMovie) {
@@ -140,9 +103,6 @@ const Form = () => {
       backdropPath: `https://image.tmdb.org/t/p/original/${selectedMovie.backdrop_path}`,
       posterPath: `https://image.tmdb.org/t/p/original/${selectedMovie.poster_path}`,
       isFeatured: 0,
-      name: formState.name,
-      url: formState.url,
-      characterName: formState.characterName,
     };
 
     axios({
@@ -162,154 +122,126 @@ const Form = () => {
       });
   };
 
-  useEffect(() => {
-    if (selectedMovie) {
-      setFormState({
-        title: selectedMovie.original_title,
-        overview: selectedMovie.overview,
-        popularity: selectedMovie.popularity,
-        releaseDate: selectedMovie.release_date,
-        voteAverage: selectedMovie.vote_average,
-      });
-    }
-  }, [selectedMovie]);
 
   return (
-    <>
-      <h1>{movieId !== undefined ? 'Edit ' : 'Create '} Movie</h1>
+    <div className="form-container">
+      <h2>{movieId !== undefined ? 'Edit ' : 'Create '} Movie</h2>
       {movieId === undefined && (
         <>
-          <div className='search-container'>
-            Search Movie:{' '}
-            <input
-              type='text'
-              onChange={(event) => setQuery(event.target.value)}
-            />
-            <button type='button' onClick={handleSearch}>
-              Search
-            </button>
-            <div className='searched-movie'>
+          <div className="movie-container">
+            <div className="search-container">
+              <input
+                type="text"
+                placeholder="Search for a movie..."
+                onChange={(event) => setQuery(event.target.value)}
+              />
+              <button className="search-btn" onClick={handleSearch}>
+                Search
+              </button>
+            </div>
+
+            <div className="searched-movie">
               {searchedMovieList.map((movie) => (
                 <p key={movie.id} onClick={() => handleSelectMovie(movie)}>
                   {movie.original_title}
                 </p>
               ))}
             </div>
+
+            <div className="paginations">
+              <button
+                onClick={() => {
+                  if (currentPage > 1) setCurrentPage(currentPage - 1);
+                }}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </button>
+              <span>{` Page ${currentPage} of ${totalPages}`}</span>
+              <button
+                onClick={() => {
+                  if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+                }}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </button>
+            </div>
           </div>
-          <div className='pagination'>
-            <button
-              onClick={() => {
-                if (currentPage > 1) setCurrentPage(currentPage - 1);
-              }}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </button>
-            <span>{` Page ${currentPage} of ${totalPages}`}</span>
-            <button
-              onClick={() => {
-                if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-              }}
-              disabled={currentPage === totalPages}
-            >
-              Next
-            </button>
-          </div>
-          <hr />
         </>
       )}
-      <div className='container'>
-        <form>
-          {selectedMovie && (
-            <img
-              className='poster-image'
-              src={`https://image.tmdb.org/t/p/original/${selectedMovie.poster_path}`}
-              alt="Movie poster"
-            />
-          )}
 
-          <div className='field'>
-            Title:
+      <div className="container">
+        {selectedMovie && (
+          <img
+            className="poster-image"
+            src={`https://image.tmdb.org/t/p/original/${selectedMovie.poster_path}`}
+            alt="Movie poster"
+          />
+        )}
+
+        <div className="form-fields">
+          <div className="field title-field">
+            <label htmlFor="title">Title</label>
             <input
-              type='text'
+              type="text"
+              id="title"
               value={formState.title}
               onChange={(e) => setFormState({ ...formState, title: e.target.value })}
             />
           </div>
-          <div className='field'>
-            Overview:
+          <div className="field overview-field">
+            <label htmlFor="overview">Overview</label>
             <textarea
+              id="overview"
               rows={10}
               value={formState.overview}
               onChange={(e) => setFormState({ ...formState, overview: e.target.value })}
             />
           </div>
-          <div className='field'>
-            Popularity:
+          <div className="field popularity-field">
+            <label htmlFor="popularity">Popularity</label>
             <input
-              type='text'
+              type="text"
               value={formState.popularity}
               onChange={(e) => setFormState({ ...formState, popularity: e.target.value })}
             />
           </div>
-          <div className='field'>
-            Release Date:
+          <div className="field releasedate-field">
+            <label htmlFor="releasedate">Release Date</label>
             <input
-              type='text'
+              type="text"
               value={formState.releaseDate}
               onChange={(e) => setFormState({ ...formState, releaseDate: e.target.value })}
             />
           </div>
-          <div className='field'>
-            Vote Average:
+          <div className="field voteaverage-field">
+            <label htmlFor="voteaverage">Vote Average</label>
             <input
-              type='text'
+              type="text"
               value={formState.voteAverage}
               onChange={(e) => setFormState({ ...formState, voteAverage: e.target.value })}
             />
           </div>
-          <nav>
-            <ul className='tabs'>
-              <li
-                onClick={() => {
-                  navigate(`/main/movies/form/${movieId}/casts`);
-                }}
-              >
-                Cast & Crews
-              </li>
-              <li
-                onClick={() => {
-                  navigate(`/main/movies/form/${movieId}/videos`);
-                }}
-              >
-                Videos
-              </li>
-              <li
-                onClick={() => {
-                  navigate(`/main/movies/form/${movieId}/photos`);
-                }}
-              >
-                Photos
-              </li>
-            </ul>
-          </nav>
-        </form>
+
+          <div className="button-container">
+            <button className="save-btn" type="button" onClick={handleSave}>
+              {movieId ? 'Update' : 'Save'}
+            </button>
+            <button
+              className="back-btn"
+              type="button"
+              onClick={() => {
+                if (window.confirm('Are you sure you want to exit?')) {
+                  navigate('/main/movies');
+                }
+              }}
+            >
+              Back
+            </button>
+          </div>
+        </div>
       </div>
-
-      <button type='button' onClick={handleSave}>
-        {movieId ? 'Update' : 'Save'}
-      </button>
-
-      <button
-        type='button'
-        onClick={() => {
-          if (window.confirm('Are you sure you want to exit?')) {
-            navigate('/main/movies');
-          }
-        }}
-      >
-        Back
-      </button>
 
       {movieId !== undefined && selectedMovie && (
         <div>
@@ -317,7 +249,7 @@ const Form = () => {
           <Outlet />
         </div>
       )}
-    </>
+    </div>
   );
 };
 

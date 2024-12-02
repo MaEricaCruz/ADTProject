@@ -26,9 +26,7 @@ const Lists = () => {
 
   
   const handleDelete = (id) => {
-    const isConfirm = window.confirm(
-      'Are you sure that you want to delete this data?'
-    );
+    const isConfirm = window.confirm('Are you sure that you want to delete this movie?');
     if (isConfirm) {
       axios
         .delete(`/movies/${id}`, {
@@ -37,21 +35,18 @@ const Lists = () => {
           },
         })
         .then(() => {
-          setLists((prevLists) => {
-            const updatedLists = prevLists.filter((movie) => movie.id !== id);
-         
-            const newTotalPages = Math.ceil(updatedLists.length / itemsPerPage);
-            setTotalPages(newTotalPages);
-            if (currentPage > newTotalPages) {
-              setCurrentPage(newTotalPages);
-            }
-
-            return updatedLists;
-          });
+          alert('Movie deleted successfully!');
+          setLists((prevLists) => prevLists.filter((movie) => movie.id !== id));
+          getMovies();
         })
-        .catch((error) => console.error('Delete error:', error));
+        .catch((error) => {
+          console.error('Delete error:', error);
+          alert('Failed to delete movie. Please try again.');
+        });
     }
-  }; 
+  };
+  
+
            
   const displayedMovies = lists.slice(
     (currentPage - 1) * itemsPerPage,
@@ -67,7 +62,7 @@ const Lists = () => {
         <button
           type='button'
           onClick={() => {
-            navigate('/main/movies/form/AdMovie');
+            navigate('/main/movies/form');
           }}
         >
          Add Movie

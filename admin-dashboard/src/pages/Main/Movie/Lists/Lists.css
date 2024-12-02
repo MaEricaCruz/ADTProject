@@ -20,7 +20,7 @@
   color: white;
   padding: 10px 20px;
   font-size: 16px;
-  margin-left: 1140px;
+  margin-left: 1280px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -64,6 +64,7 @@
 
 .movie-lists button {
   padding: 5px 10px;
+  text-align: right;
   margin: 0 5px;
   font-size: 14px;
   border: none;
