@@ -5,6 +5,7 @@ import './VideoList.css';
 const Videos = ({ movieId }) => {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -23,6 +24,12 @@ const Videos = ({ movieId }) => {
 
     fetchVideos();
   }, [movieId]);
+
+  const handleShowMore = () => {
+    setShowAll((prevShowAll) => !prevShowAll);
+  };
+
+  const videosToShow = showAll ? videos : videos.slice(0, 2);
 
   const handleSaveVideos = async () => {
     const accessToken = localStorage.getItem('accessToken');
@@ -53,15 +60,20 @@ const Videos = ({ movieId }) => {
 
   return (
     <div className="videos">
-      {/**<button onClick={handleSaveVideos}>Save Videos</button>**/}
-      {videos.length > 0 ? (
+      <div className="video-header">
+        <h2>Videos</h2>
+        <button onClick={handleShowMore}>
+          {showAll ? 'Show Less' : 'Show More'}
+        </button>
+      </div>
+      {videosToShow.length > 0 ? (
         <ul>
-          {videos.map((video) => (
+          {videosToShow.map((video) => (
             <li key={video.id}>
               <iframe
                 title={video.name}
-                width="560"
-                height="315"
+                width="800"
+                height="400"
                 src={`https://www.youtube.com/embed/${video.key}`}
                 allowFullScreen
               ></iframe>

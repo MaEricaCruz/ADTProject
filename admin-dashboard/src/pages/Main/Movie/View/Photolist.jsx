@@ -5,6 +5,7 @@ import './Photolist.css';
 const Photos = ({ movieId }) => {
   const [photos, setPhotos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     const fetchPhotos = async () => {
@@ -23,6 +24,12 @@ const Photos = ({ movieId }) => {
 
     fetchPhotos();
   }, [movieId]);
+
+  const handleShowMore = () => {
+    setShowAll((prevShowAll) => !prevShowAll);
+  };
+
+  const photosToShow = showAll ? photos : photos.slice(0, 5);
 
   const handleSavePhotos = async () => {
     const accessToken = localStorage.getItem('accessToken');
@@ -53,18 +60,26 @@ const Photos = ({ movieId }) => {
 
   return (
     <div className="photos">
-
-      {/**<button onClick={handleSavePhotos}>Save Photos</button>**/}
-      <div className="photos-grid">
-        {photos.map((photo) => (
-          <img
-            key={photo.file_path}
-            src={`https://image.tmdb.org/t/p/w300/${photo.file_path}`}
-            alt="Movie scene"
-            className="photo-image"
-          />
-        ))}
+      <div className="photos-header">
+        <h2>Photos</h2>
+        <button onClick={handleShowMore} className="show-more-button">
+          {showAll ? 'Show Less' : 'Show More'}
+        </button>
       </div>
+      {photosToShow.length > 0 ? (
+        <div className="photo-gallery">
+          {photosToShow.map((photo) => (
+            <img
+              key={photo.file_path}
+              src={`https://image.tmdb.org/t/p/w300/${photo.file_path}`}
+              alt="Movie scene"
+              className="photo-image"
+            />
+          ))}
+        </div>
+      ) : (
+        <p>No photos found for this movie.</p>
+      )}
     </div>
   );
 };

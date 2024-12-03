@@ -5,13 +5,17 @@ import './Castlist.css';
 const CastList = ({ movieId }) => {
   const [cast, setCast] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showAll, setShowAll] = useState(false); 
 
   useEffect(() => {
     const fetchCast = async () => {
       try {
-        const response = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}/credits`, {
-          params: { api_key: '013044f24bc916f73380c8a21b491d6b' },
-        });
+        const response = await axios.get(
+          `https://api.themoviedb.org/3/movie/${movieId}/credits`,
+          {
+            params: { api_key: '013044f24bc916f73380c8a21b491d6b' },
+          }
+        );
         setCast(response.data.cast);
       } catch (error) {
         console.error('Error fetching cast data:', error);
@@ -24,38 +28,27 @@ const CastList = ({ movieId }) => {
     fetchCast();
   }, [movieId]);
 
-  const handleSaveCast = async () => {
-    const accessToken = localStorage.getItem('accessToken');
-    if (cast.length === 0) {
-      alert('No cast data to save.');
-      return;
-    }
-
-    try {
-      const response = await axios.post(`/movies/${movieId}/cast`, {
-        cast,
-      }, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      alert('Cast data saved successfully!');
-    } catch (error) {
-      console.error('Error saving cast data:', error);
-      alert('Error saving cast data.');
-    }
-  };
-
   if (loading) {
     return <p>Loading cast...</p>;
   }
 
+
+  const handleShowMore = () => {
+    setShowAll((prevShowAll) => !prevShowAll);
+  };
+
+  const castToShow = showAll ? cast : cast.slice(0, 10); 
+
   return (
     <div className="cast-list">
-
+      <div className="cast-header">
+        <h2>Cast</h2>
+        <button className="more-button" onClick={handleShowMore}>
+          {showAll ? 'Show Less' : 'Show More'}
+        </button>
+      </div>
       <ul>
-        {cast.map((member) => (
+        {castToShow.map((member) => (
           <li key={member.id}>
             <img
               src={`https://image.tmdb.org/t/p/w200/${member.profile_path}`}
@@ -63,7 +56,9 @@ const CastList = ({ movieId }) => {
               className="cast-image"
             />
             <div>
-              <p><strong>{member.name}</strong></p>
+              <p>
+                <strong>{member.name}</strong>
+              </p>
               <p>Character: {member.character}</p>
             </div>
           </li>

@@ -127,8 +127,8 @@ const Home = () => {
             <MovieCards
               key={movie.id}
               movie={movie}
-              onClick={() => {
-                navigate(`/movies/${movie.id}`);
+              onClick={() => {console.log('Navigating to movie ID:',  movie.tmdbId);
+                navigate(`/main/movies/view/${movie.tmdbId}`);
                 setMovie(movie);
               }}
             />

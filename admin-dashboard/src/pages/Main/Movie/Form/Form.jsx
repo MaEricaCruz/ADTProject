@@ -13,31 +13,21 @@ const Form = () => {
     overview: '',
     popularity: '',
     releaseDate: '',
-    voteAverage: ''
+    voteAverage: '',
+    casts: [],
+    videos: [], 
+    photos: [],
   });
+
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
   const { movieId } = useParams();
+  const [casts, setCasts] = useState([]);
+  const [videos, setVideos] = useState([]);
+  const [photos, setPhotos] = useState([]);
 
-  useEffect(() => {
-    if (movieId) {
-      axios.get(`/movies/${movieId}`)
-        .then((response) => {
-          const movie = response.data;
-          setFormState({
-            title: movie.title,
-            overview: movie.overview,
-            popularity: movie.popularity,
-            releaseDate: movie.releaseDate,
-            voteAverage: movie.voteAverage
-          });
-          setSelectedMovie(movie);
-        })
-        .catch((error) => console.error(error));
-    }
-  }, [movieId]);
-
+  
   const handleSearch = useCallback(async () => {
     if (!query) return;
     try {
@@ -76,6 +66,7 @@ const Form = () => {
     }
   }, [query, currentPage, handleSearch]);
 
+
   const handleSelectMovie = (movie) => {
     setFormState({
       title: movie.original_title,
@@ -83,9 +74,85 @@ const Form = () => {
       popularity: movie.popularity,
       releaseDate: movie.release_date,
       voteAverage: movie.vote_average,
+      backdropPath: movie.backdropPath,
+      posterPath: movie.backdropPath,
+      casts: [],
+      videos: [],
+      photos: [],
     });
     setSelectedMovie(movie);
   };
+  
+  useEffect(() => {
+    const fetchMovieData = async () => {
+      try {
+        if (movieId) {
+          const movieResponse = await axios.get(`/movies/${movieId}`);
+          const movie = movieResponse.data;
+  
+          setFormState({
+            title: movie.title,
+            overview: movie.overview,
+            popularity: movie.popularity,
+            releaseDate: movie.releaseDate,
+            voteAverage: movie.voteAverage,
+            backdropPath: movie.backdropPath,
+            posterPath: movie.backdropPath,
+            casts: [],
+            videos: [],
+            photos: [],
+          });
+          setSelectedMovie(movie);
+  
+          const videoResponse = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}/videos?language=en-US`,{
+              headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer 013044f24bc916f73380c8a21b491d6b',
+              },
+            }
+          );
+          setVideos(videoResponse.data.results);
+          setFormState((prevData) => ({
+            ...prevData,
+            videos: videoResponse.data.results,
+          }));
+  
+          const castResponse = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}/credits?language=en-US`,{
+              headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer 013044f24bc916f73380c8a21b491d6b',
+              },
+            }
+          );
+          setCasts(castResponse.data.cast);
+          setFormState((prevData) => ({
+            ...prevData,
+            casts: castResponse.data.cast,
+          }));
+  
+      
+          const photoResponse = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}/images`,{
+              headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer 013044f24bc916f73380c8a21b491d6b',
+              },
+            }
+          );
+          setPhotos(photoResponse.data.backdrops);
+          setFormState((prevData) => ({
+            ...prevData,
+            photos: photoResponse.data.backdrops,
+          }));
+        }
+      } catch (error) {
+        console.error('Error fetching movie data:', error);
+      }
+    };
+  
+    fetchMovieData();
+  }, [movieId]); 
+
+
   const handleSave = () => {
     const accessToken = localStorage.getItem('accessToken');
     if (!selectedMovie) {
@@ -103,6 +170,9 @@ const Form = () => {
       backdropPath: `https://image.tmdb.org/t/p/original/${selectedMovie.backdrop_path}`,
       posterPath: `https://image.tmdb.org/t/p/original/${selectedMovie.poster_path}`,
       isFeatured: 0,
+      cast: formState.cast,
+      videos: formState.videos,
+      photos: formState.photos,
     };
 
     axios({
@@ -122,10 +192,42 @@ const Form = () => {
       });
   };
 
+  const handleUpdate = handleSave;
+
+  useEffect(() => {
+    if (movieId) {
+     
+      axios.get(`/movies/${movieId}`)
+      .then((response) => {
+        const movieData = response.data;
+        setSelectedMovie({
+          id: movieData.tmdbId,
+          original_title: movieData.title,
+          overview: movieData.overview,
+          popularity: movieData.popularity,
+          poster_path: movieData.posterPath.replace("https://image.tmdb.org/t/p/original/", ""),
+          release_date: movieData.releaseDate,
+          vote_average: movieData.voteAverage,
+        });
+        setFormState({
+          title: movieData.title,
+          overview: movieData.overview,
+          popularity: movieData.popularity,
+          releaseDate: movieData.releaseDate,
+          voteAverage: movieData.voteAverage,
+          videos: movieData.videos || [], 
+          casts: movieData.casts || [], 
+          photos: movieData.photos || [],
+        });
+      })
+  }
+  }, [movieId]);
+
+
 
   return (
     <div className="form-container">
-      <h2>{movieId !== undefined ? 'Edit ' : 'Create '} Movie</h2>
+      <h3>{movieId !== undefined ? 'Edit ' : 'Create '} Movie</h3>
       {movieId === undefined && (
         <>
           <div className="movie-container">
@@ -223,6 +325,67 @@ const Form = () => {
               onChange={(e) => setFormState({ ...formState, voteAverage: e.target.value })}
             />
           </div>
+          {selectedMovie && (
+<>
+<h2>Cast</h2>
+    <div className="casts">
+        {casts.length > 0 ? (
+            casts.map(member => (
+                <div key={member.id} className="cast-item">
+                    <h3>{member.name}</h3>
+                    <p>Character: {member.character}</p>
+                    {member.profile_path && (
+                        <img
+                            src={`https://image.tmdb.org/t/p/w500/${member.profile_path}`}
+                            alt={member.name}
+                        />
+                    )}
+                </div>
+            ))
+        ) : (
+            <p>No cast information available.</p>
+        )}
+    </div>
+    <h2>Videos</h2>
+    <div className="videos">
+        {videos.length > 0 ? (
+            videos.map(video => (
+                <div key={videos.id} className="video-item">
+                    <h3>{videos.name}</h3>
+                    <iframe
+                        src={`https://www.youtube.com/embed/${video.key}`}
+                        title={video.name}
+                        frameBorder="0"
+                        allowFullScreen
+                    ></iframe>
+                </div>
+            ))
+        ) : (
+            <p>No videos available.</p>
+        )}
+    </div>
+
+    <h2>Photos</h2>
+   <div className="photos">
+    {photos.length > 0 ? (
+        photos.map((photo, index) => (
+            <div key={index} className="photo-item">
+                {photo.file_path && (
+                    <img
+                        src={`https://image.tmdb.org/t/p/w500/${photo.file_path}`}
+                        alt={`Photo ${index + 1}`}
+                        className="photo-image"
+                    />
+                )}
+            </div>
+        ))
+    ) : (
+        <p>No photos available.</p>
+    )}
+</div>
+
+</>
+      )}
 
           <div className="button-container">
             <button className="save-btn" type="button" onClick={handleSave}>

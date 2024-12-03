@@ -1,11 +1,43 @@
-.videos {
-    margin: 20px 0;
-  }
-  
-  .videos iframe {
-    width: 100%;
-    max-width: 560px;
-    height: 315px;
-    margin-bottom: 15px;
-  }
-  
+.video-header {
+  margin-top: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.video-header h2 {
+  margin: 0;
+  font-size: 3rem;
+  color: #fff;
+}
+
+button {
+  background-color: #00ff99;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  color: #1e1e1e;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #00cc7a;
+}
+
+iframe {
+  width: 100%;
+  max-width: 1125px;
+  height: 500px;
+  margin-bottom: 20px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  margin-bottom: 15px;
+}

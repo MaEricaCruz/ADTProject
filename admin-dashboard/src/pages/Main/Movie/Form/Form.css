@@ -5,6 +5,29 @@ body {
   padding: 0;
 }
 
+.form-container h3{
+  font-size: 3rem; 
+  font-weight: bold;
+  text-align: left; 
+  color: #fff; 
+  margin-top: 3rem;
+  margin-left: 0; 
+  width: 100%; 
+  position: relative; 
+  padding-left: 1rem; 
+}
+
+.form-container h3::after{
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 1rem; 
+  width: 250px;
+  height: 3px; 
+  background-color: #32cd32; 
+  border-radius: 2px; 
+}
+
 .form-fields {
   flex: 1; 
   display: flex;
@@ -108,7 +131,7 @@ nav li:hover {
 
 .poster-image {
   width: 550px;
-  height: 805px;
+  height: 1300px;
   object-fit: cover;
   border: 2px solid #ddd;
   border-radius: 8px;
@@ -191,7 +214,7 @@ body {
 h2 {
   font-size: 40px;
  font-weight: bold;
-  color: #ff6f61; 
+  color: #fff; 
   text-align: left;
   margin-top: 20px;
   margin-bottom: 30px;
