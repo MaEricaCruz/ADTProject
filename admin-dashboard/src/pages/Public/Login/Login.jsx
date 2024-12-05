@@ -1,4 +1,3 @@
-
 import { useState, useRef, useCallback, useEffect } from 'react';
 import './Login.css';
 import { useNavigate } from 'react-router-dom';
@@ -44,19 +43,23 @@ function Login() {
     const data = { email, password };
     setStatus('loading');
 
-    try {
-      const res = await axios.post('http://localhost:3000/admin/login', data, {
-        headers: { 'Access-Control-Allow-Origin': '*' },
+    await axios({
+      method: 'post',
+      url: '/admin/login',
+      data,
+      headers: { 'Access-Control-Allow-Origin': '*' },
+    })
+      .then((res) => {
+        console.log(res);
+        localStorage.setItem('accessToken', res.data.access_token);
+        navigate('/main/movies');
+        setStatus('idle');
+      })
+      .catch((e) => {
+        setError(e.response.data.message);
+        console.log(e);
+        setStatus('idle');
       });
-      console.log(res);
-      localStorage.setItem('accessToken', res.data.access_token);
-      navigate('/main/movies/home');
-      setStatus('idle');
-    } catch (e) {
-      setError(e.response?.data?.message || 'Something went wrong');
-      console.log(e);
-      setStatus('idle');
-    }
   };
 
   useEffect(() => {

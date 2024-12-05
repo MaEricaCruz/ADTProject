@@ -29,7 +29,7 @@ const Photos = ({ movieId }) => {
     setShowAll((prevShowAll) => !prevShowAll);
   };
 
-  const photosToShow = showAll ? photos : photos.slice(0, 5);
+  const photosToShow = showAll ? photos : photos.slice(0, 6);
 
   const handleSavePhotos = async () => {
     const accessToken = localStorage.getItem('accessToken');

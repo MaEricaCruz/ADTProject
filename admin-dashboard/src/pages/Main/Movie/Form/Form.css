@@ -5,28 +5,30 @@ body {
   padding: 0;
 }
 
-.form-container h3{
-  font-size: 3rem; 
+.form-container h3 {
+  font-size: 2rem; 
   font-weight: bold;
   text-align: left; 
   color: #fff; 
-  margin-top: 3rem;
+  margin-top: 2rem; /* Increased top margin for more spacing */
+  margin-bottom: 1.5rem; /* Added bottom margin for separation */
   margin-left: 0; 
   width: 100%; 
   position: relative; 
-  padding-left: 1rem; 
+  padding-left: 1rem; /* Keeps consistent padding */
 }
 
-.form-container h3::after{
+.form-container h3::after {
   content: '';
   position: absolute;
   bottom: -10px;
   left: 1rem; 
-  width: 250px;
+  width: 200px;
   height: 3px; 
   background-color: #32cd32; 
   border-radius: 2px; 
 }
+
 
 .form-fields {
   flex: 1; 
@@ -37,6 +39,7 @@ body {
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   padding: 20px; 
+  height: 1300px;
 }
 
 .field label {
@@ -82,6 +85,7 @@ body {
   transition: background-color 0.3s;
   width: 160px;
   color: white; 
+  margin-top: 190px;
   text-align: center;
 }
 
@@ -159,6 +163,7 @@ body {
 }
 
 .search-container {
+  margin-top: 3rem;
   display: flex;
   align-items: center; 
   gap: 10px; 

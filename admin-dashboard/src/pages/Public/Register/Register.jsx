@@ -82,10 +82,10 @@ function Register() {
   }, [userInputDebounce]);
 
   return (
-    <div className="Login">
+    <div className="Register">
       <div className="mains-container">
         <form>
-          <div className="form-container">
+          <div className="formed-container">
             <h1>Register</h1>
             {errorMessage && <span className="errors">{errorMessage}</span>}
 

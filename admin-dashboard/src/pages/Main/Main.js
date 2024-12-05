@@ -1,22 +1,21 @@
 import { useEffect, useState } from 'react';
-import { Outlet, useNavigate, Link } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import './Main.css';
-import Logo from '../../assets/Logo.png';
-
+import logos from '../../assets/logos.png'
 
 function Main() {
   const accessToken = localStorage.getItem('accessToken');
   const navigate = useNavigate();
-
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false); 
 
   const handleLogout = () => {
     localStorage.removeItem('accessToken');
     navigate('/');
   };
 
-  const toggleDropdown = () => {
-    setDropdownOpen(!dropdownOpen);
+  const handleDashboardToggle = () => {
+    setIsMenuOpen(!isMenuOpen);
+    console.log("Dashboard menu toggled!");
   };
 
   useEffect(() => {
@@ -29,26 +28,36 @@ function Main() {
     <div className="Main">
       <div className="navbar">
         <div className="navbar-left">
-          <img src={Logo} alt="Logo" className="logo" />
-          <ul className="navbar-menu">
-            <li>
-            <a href="/main/movies/home">Home</a>
-            </li>
-            <li>
-            <a href="/main/movies">Movies</a>
-            </li>
-          </ul>
+          <img src={logos} alt="logos" className="logos" />
         </div>
-        
-       <div className="navbar-right">
-          {/*<div className="search-box">
-            <img src={SearchIcon} alt="Search" className="search-icon" />
-            <input type="text" placeholder="Enter keywords..." />
-          </div>*/}
 
-          <a onClick={handleLogout}>Logout</a>
-        </div>
+        <button className="hamburger-button" onClick={handleDashboardToggle}>
+        <div className={`line ${isMenuOpen ? 'open' : ''}`}></div>
+          <div className={`line ${isMenuOpen ? 'open' : ''}`}></div>
+          <div className={`line ${isMenuOpen ? 'open' : ''}`}></div>
+        </button>
       </div>
+
+      {isMenuOpen && (
+        <div className="dashboard-popup">
+          <div className="dashboard-content">
+            <ul className="dashboard-menu">
+            <div className="navbar-left">
+          <img src={logos} alt="logos" className="logo" />
+        </div>
+              <li>
+                <a href="/main/movies/home">Home</a>
+              </li>
+              <li>
+                <a href="/main/movies">Movies</a>
+              </li>
+            </ul>
+            <div className="navbar-right">
+              <a onClick={handleLogout}>Logout</a>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="content">
         <Outlet />

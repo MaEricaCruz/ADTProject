@@ -4,11 +4,16 @@
   justify-content: center;
   align-items: center;
   color: #53322a; 
-  
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  height: 100vh;
+  background-image: url('../Register/background.webp'); 
+  background-size: cover; 
+  background-position: center; 
+  background-repeat: no-repeat; 
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
+  min-height: 100vh;
   padding: 1rem;
+  margin: 0; 
 }
+
 .logos {
   height: 70px;
   margin-left: 1280px;
@@ -16,10 +21,10 @@
 
 .form-containers {
   width: 125%;
-  height: 450px;
+  height: 445px;
   max-width: 40000px;
   padding: 2rem;
-  background-color: rgba(0, 0, 0, 0.75); 
+  background-color: rgba(8, 8, 8, 0.75); 
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
   text-align: center;
@@ -29,7 +34,7 @@
 .form-containers h1 {
   margin-bottom: 10px;
   font-size: 2rem;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
   color: #fff;
 }
 
@@ -49,7 +54,7 @@ input {
 }
 
 input::placeholder {
-  color: #aaa;
+  color: #020101;
 }
 
 .errors {
@@ -61,6 +66,7 @@ input::placeholder {
 
 .submit-container button {
   width: 100%;
+  margin-bottom: 10px;
   padding: 0.8rem;
   background-color: #12bb67; 
   color: #fff;

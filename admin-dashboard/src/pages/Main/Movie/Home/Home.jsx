@@ -5,12 +5,14 @@ import axios from 'axios';
 import { useMovieContext } from '../../../../context/MovieContext';
 import MovieCards from '../../../../components/components/MovieCards';
 
+
 const Home = () => {
   const navigate = useNavigate();
   const [featuredMovie, setFeaturedMovie] = useState(null);
   const { movieList, setMovieList, setMovie } = useMovieContext();
   const [trailerKey, setTrailerKey] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
 
   
   const getMovies = () => {
@@ -76,6 +78,7 @@ const Home = () => {
     // Add logic for saving the movie to a database or state
     console.log('Selected movie:', movie);
   };
+
 
   return (
     <div className="main-container">

@@ -11,11 +11,13 @@ module.exports = function (app) {
   );
 
   app.use(
-    '/admin', // Handle /admin path
+    '/admin', 
     createProxyMiddleware({
       target: 'http://localhost:3000',
       changeOrigin: true,
       secure: false,
     })
   );
+  
+  
 };

@@ -1,12 +1,12 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
 import { MovieProvider } from './context/MovieContext';
-import { Route, Routes, createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { Route, createBrowserRouter, RouterProvider } from 'react-router-dom';
 import './index.css';
 
 import Login from './pages/Public/Login/Login';
 import Register from './pages/Public/Register/Register';
-//import Dashboard from './pages/Main/Dashboard/Dashboard';
+import Dashboard from './pages/Main/Dashboard/Dashboard';
 import Main from './pages/Main/Main';
 import Movie from './pages/Main/Movie/Movie';
 import Lists from './pages/Main/Movie/Lists/Lists';
@@ -31,6 +31,10 @@ const router = createBrowserRouter([
     path: '/main',
     element: <Main />,
     children: [
+        {
+          path: '/main/dashboard',
+         element: <Dashboard />,
+        },
       {
         path: '/main/movies',
         element: <Movie />,
@@ -63,8 +67,6 @@ const router = createBrowserRouter([
             path: '/main/movies/form/:movieId?',
             element: <Form />,
           },      
-
-   
         ],
       },
     ],

@@ -87,6 +87,7 @@ const Form = () => {
     const fetchMovieData = async () => {
       try {
         if (movieId) {
+          // Fetch movie details
           const movieResponse = await axios.get(`/movies/${movieId}`);
           const movie = movieResponse.data;
   
@@ -103,55 +104,56 @@ const Form = () => {
             photos: [],
           });
           setSelectedMovie(movie);
-  
-          const videoResponse = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}/videos?language=en-US`,{
-              headers: {
-                Accept: 'application/json',
-                Authorization: 'Bearer 013044f24bc916f73380c8a21b491d6b',
-              },
-            }
-          );
-          setVideos(videoResponse.data.results);
-          setFormState((prevData) => ({
-            ...prevData,
-            videos: videoResponse.data.results,
-          }));
-  
-          const castResponse = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}/credits?language=en-US`,{
-              headers: {
-                Accept: 'application/json',
-                Authorization: 'Bearer 013044f24bc916f73380c8a21b491d6b',
-              },
-            }
-          );
+
+           // Fetch cast                        
+           const castResponse = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}/credits`, {
+            headers: {
+              Accept: 'application/json',
+              Authorization: 'Bearer 013044f24bc916f73380c8a21b491d6b',
+
+            },
+          });
           setCasts(castResponse.data.cast);
           setFormState((prevData) => ({
             ...prevData,
             casts: castResponse.data.cast,
           }));
   
-      
-          const photoResponse = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}/images`,{
-              headers: {
-                Accept: 'application/json',
-                Authorization: 'Bearer 013044f24bc916f73380c8a21b491d6b',
-              },
-            }
-          );
+          // Fetch videos
+          const videoResponse = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}/videos?language=en-US`, {
+            headers: {
+              Accept: 'application/json',
+              Authorization: 'Bearer 013044f24bc916f73380c8a21b491d6b',
+            },
+          });
+          setVideos(videoResponse.data.results);
+          setFormState((prevData) => ({
+            ...prevData,
+            videos: videoResponse.data.results,
+          }));
+  
+          // Fetch photos
+          const photoResponse = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}/images`, {
+            headers: {
+              Accept: 'application/json',
+              Authorization: 'Bearer 013044f24bc916f73380c8a21b491d6b',
+            },
+          });
           setPhotos(photoResponse.data.backdrops);
           setFormState((prevData) => ({
             ...prevData,
-            photos: photoResponse.data.backdrops,
+            photo: photoResponse.data.backdrops,
           }));
         }
       } catch (error) {
         console.error('Error fetching movie data:', error);
+        alert('An error occurred while fetching the movie data. Please try again later.');
       }
     };
   
     fetchMovieData();
-  }, [movieId]); 
-
+  }, [movieId]);
+  
 
   const handleSave = () => {
     const accessToken = localStorage.getItem('accessToken');
