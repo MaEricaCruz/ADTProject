@@ -75,7 +75,6 @@ const Home = () => {
   }, [movieList]);
 
   const setSelectedMovie = (movie) => {
-    // Add logic for saving the movie to a database or state
     console.log('Selected movie:', movie);
   };
 

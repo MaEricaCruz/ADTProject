@@ -45,7 +45,7 @@
 .movie-lists th, .movie-lists td {
   text-align: center;
   padding: 10px;
-  border: 1px solid #535353; /**/
+  border: 1px solid #535353; 
 }
 
 .movie-lists th {
