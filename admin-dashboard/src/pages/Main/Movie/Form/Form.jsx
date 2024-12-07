@@ -132,12 +132,14 @@ const videosToShow = showAll ? videos : videos.slice(0, 3);
             original_title: response.data.title,
             overview: response.data.overview,
             popularity: response.data.popularity,
+            release_date: response.data.releaseDate,
+            vote_average: response.data.voteAverage,
+            backdrop_path: response.data.backdropPath,
             poster_path: response.data.posterPath.replace(
               "https://image.tmdb.org/t/p/original/",
               ""
             ),
-            release_date: response.data.releaseDate,
-            vote_average: response.data.voteAverage,
+           
           };
           setSelectedMovie(tempData);
           setFormData({
@@ -146,6 +148,8 @@ const videosToShow = showAll ? videos : videos.slice(0, 3);
             popularity: response.data.popularity,
             releaseDate: response.data.releaseDate,
             voteAverage: response.data.voteAverage,
+            backdrop_path: response.data.backdropPath,
+            poster_path: response.data.posterPath
           });
           fetchMovieDetails(response.data.tmdbId); 
         })
@@ -180,80 +184,60 @@ const videosToShow = showAll ? videos : videos.slice(0, 3);
     }
   };
 
-  const validateForm = () => {
-    const errors = [];
-    if (!formData.title) errors.push("Title is required");
-    if (!formData.overview) errors.push("Overview is required");
-    if (!formData.releaseDate) errors.push("Release date is required");
-    if (!formData.popularity) errors.push("Popularity is required");
-    if (!formData.voteAverage) errors.push("Vote average is required");
-    if (!selectedMovie) errors.push("Please select a movie from search results");
-    return errors;
-  };
 
   const handleSave = async () => {
-    const validationErrors = validateForm();
-    if (validationErrors.length > 0) {
-      setError(validationErrors.join(", "));
-      return;
-    }
-
     setIsLoading(true);
     setError("");
 
-    const accessToken = localStorage.getItem("accessToken");
-    if (!accessToken) {
-      setError("You must be logged in to perform this action");
-      setIsLoading(false);
+    const accessToken = localStorage.getItem('accessToken');
+    if (!selectedMovie) {
+      alert('Please search and select a movie.');
       return;
     }
 
-    const data =console.log("Data to be sent:", {
+    const data = {
       tmdbId: selectedMovie.id,
       title: formData.title,
       overview: formData.overview,
-      popularity: parseFloat(formData.popularity),
+      popularity: formData.popularity,
       releaseDate: formData.releaseDate,
       voteAverage: parseFloat(formData.voteAverage),
       backdropPath: `https://image.tmdb.org/t/p/original/${selectedMovie.backdrop_path}`,
       posterPath: `https://image.tmdb.org/t/p/original/${selectedMovie.poster_path}`,
       isFeatured: 0,
       videos: videos || [],
-      cast: cast || [],
+      casts: cast || [],
       photos: photos || [],
-    });
-    
-console.log("Form Data:", formData);
-console.log("Videos:", videos);
-console.log("Cast:", cast);
-console.log("Photos:", photos);
-
+    };
+        
     try {
-      await axios({
+      const response = await axios({
         method: movieId ? "patch" : "post",
-        url: movieId ? `/movies/${movieId}` : "/movies",
-        data,
+        url: movieId ? `/movies/${movieId}` : '/movies',
+        data: data,
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
+      
+      alert('Movie saved successfully!');
       navigate("/main/movies");
     } catch (error) {
-      console.error("Error saving movie:", error.response?.data || error.message);
-    } finally {
-      setIsLoading(false);
-    }
+      const errorMessage = error.response?.data?.errors 
+        ? error.response.data.errors.join(", ") 
+        : error.message;
+    
+      console.error("Error saving movie:", errorMessage);
+      alert(`Failed to save movie: ${errorMessage}`);
+    };
   };
 
   const handleUpdate = handleSave;
 
   useEffect(() => {
     if (movieId) {
-      setIsLoading(true);
-      setError("");
-
-      axios
-        .get(`/movies/${movieId}`)
+    
+      axios.get(`/movies/${movieId}`)
         .then((response) => {
           const movieData = response.data;
           setSelectedMovie({
@@ -273,6 +257,7 @@ console.log("Photos:", photos);
             voteAverage: movieData.voteAverage,
             videos: movieData.videos || [],
             cast: movieData.cast || [],
+            photos: movieData.photos || [],
           });
         })
         .catch(() => {
@@ -356,12 +341,10 @@ console.log("Photos:", photos);
               <label htmlFor="title">Title</label>
               <input
                 type="text"
-                name="title"
                 id="title"
                 value={formData.title}
                 onChange={handleInputChange}
                 disabled={isLoading}
-                required
               />
             </div>
             <div className="field overview-field">
@@ -369,48 +352,40 @@ console.log("Photos:", photos);
               <textarea
                 className="overview"
                 rows={10}
-                name="overview"
                 id="overview"
                 value={formData.overview}
                 onChange={handleInputChange}
                 disabled={isLoading}
-                required
               />
             </div>
             <div className="field popularity-field">
               <label htmlFor="popularity">Popularity</label>
               <input
                 type="number"
-                name="popularity"
                 id="popularity"
                 value={formData.popularity}
                 onChange={handleInputChange}
                 disabled={isLoading}
-                step="0.1"
               />
             </div>
             <div className="field releasedate-field">
               <label htmlFor="releaseDate">Release Date</label>
               <input
                 type="date"
-                name="releaseDate"
                 id="releaseDate"
                 value={formData.releaseDate}
                 onChange={handleInputChange}
                 disabled={isLoading}
-                required
               />
             </div>
             <div className="field voteaverage-field">
               <label htmlFor="voteAverage">Vote Average</label>
               <input
-                type="number"
-                name="voteAverage"
+                type="text"
                 id="voteAverage"
                 value={formData.voteAverage}
                 onChange={handleInputChange}
                 disabled={isLoading}
-                step="0.1"
               />
             </div>
           </div>
@@ -463,36 +438,34 @@ console.log("Photos:", photos);
               <div className="photos-header">
                 <h2>Photos</h2>
               </div>
-              <div className="photo-grid">
-                {photos.slice(0, 3).map((photo) => (
+              <div className="photo-gallery">
+                {photos.slice(0, 4).map((photo) => (
                   <img
                     key={photo.file_path}
                     src={`https://image.tmdb.org/t/p/original${photo.file_path}`}
                     alt="Movie Photo"
-                    width="180"
-                    height="300"
-                    className="photos-item"
+                    className="photo-image"
                   />
                 ))}
               </div>
             </div>
           </div>
+
+
           <div className="button-container">
-            <button
-              className="btn-save"
-              type="button"
-              onClick={movieId ? handleUpdate : handleSave}
-              disabled={isLoading}
-            >
-              {isLoading ? "Saving..." : "Save"}
+            <button className="save-btn" type="button" onClick={handleSave}>
+              {movieId ? 'Update' : 'Save'}
             </button>
             <button
-              className="btn-cancel"
+              className="back-btn"
               type="button"
-              onClick={() => navigate("/main/movies")}
-              disabled={isLoading}
+              onClick={() => {
+                if (window.confirm('Are you sure you want to exit?')) {
+                  navigate('/main/movies');
+                }
+              }}
             >
-              Cancel
+              Back
             </button>
           </div>
         </div>
