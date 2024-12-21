@@ -36,7 +36,7 @@ const Home = () => {
         `https://api.themoviedb.org/3/movie/${movieId}/videos`,
         {
           params: {
-            api_key: '013044f24bc916f73380c8a21b491d6b', // TMDB API key
+            api_key: '013044f24bc916f73380c8a21b491d6b', 
             language: 'en-US',
           },
         }
@@ -122,7 +122,7 @@ const Home = () => {
         </div>
       )}
 
-      <p className="page-title">Trending Movies</p>
+      <p className="page-title">Movies</p>
       {movieList && movieList.length ? (
         <div className="list-container">
           {movieList.map((movie) => (

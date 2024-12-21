@@ -62,7 +62,7 @@ body {
 .navbar-right {
   display: flex;
   align-items: center;
-  gap: 110px;
+  gap: 180px;
 }
 
 .search-box {
@@ -265,7 +265,7 @@ body {
 }
 
 .navbar-right a {
-  margin-top: 215px;
+  margin-top: 315px;
   text-decoration: none;
   color: #fff; 
   background-color: rgb(23, 161, 11); 

@@ -38,14 +38,6 @@ const View = () => {
     getView();
   }, [movieId]);
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-
-  if (error) {
-    return <p>{error}</p>;
-  }
-
   return (
     <>
       {item && (
@@ -66,16 +58,18 @@ const View = () => {
             <div className="movie-content__info">
               <h1 className="title">{item.title || item.name}</h1>
               <p className="overviews">{item.overview}</p>
-              <div className="cast">
-                <div className="section__header"></div>
+                   
+            <div className="cast">
                 <CastList movieId={movieId} />
-              </div>
-              <div className="videos">
-              </div>
+            </div>
+
+           <div className="videos">
               <VideoList movieId={movieId} />
-              <div className="photo">
-              </div>
+           </div>
+
+           <div className="photo">            
               <Photolist movieId={movieId} />
+           </div>  
             </div>
           </div>
         </>

@@ -12,9 +12,9 @@ const Home = () => {
   const { movieList, setMovieList, setMovie } = useMovieContext();
   const [trailerKey, setTrailerKey] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showAll, setShowAll] = useState(false);
 
 
-  
   const getMovies = () => {
     axios
       .get('/movies')
@@ -30,13 +30,20 @@ const Home = () => {
       .catch((error) => console.error('Failed to fetch movies:', error));
   };
 
+  const handleShowMore = () => {
+    setShowAll((prevShowAll) => !prevShowAll);
+  };
+
+  const movieToShow = showAll ? movieList : movieList.slice(0, 10);
+
+
   const watchTrailer = async (movieId) => {
     try {
       const response = await axios.get(
         `https://api.themoviedb.org/3/movie/${movieId}/videos`,
         {
           params: {
-            api_key: '013044f24bc916f73380c8a21b491d6b', // TMDB API key
+            api_key: '013044f24bc916f73380c8a21b491d6b', 
             language: 'en-US',
           },
         }
@@ -122,7 +129,7 @@ const Home = () => {
         </div>
       )}
 
-      <p className="page-title">Trending Movies</p>
+      <p className="page-title">Movies</p>
       {movieList && movieList.length ? (
         <div className="list-container">
           {movieList.map((movie) => (
@@ -151,7 +158,6 @@ const Home = () => {
               width="560"
               height="315"
               title="YouTube Trailer"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
             ></iframe>
           </div>

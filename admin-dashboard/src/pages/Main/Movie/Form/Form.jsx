@@ -91,32 +91,31 @@ const videosToShow = showAll ? videos : videos.slice(0, 3);
 
   const fetchMovieDetails = (movieId) => {
     setIsLoading(true);
+  
 
-   
-    axios
-      .get(`https://api.themoviedb.org/3/movie/${movieId}/credits`, {
-        headers: { Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5M2Q4YTQwMGVlMzFkMzQ4MGYzNjdlMjk2OGMzODhhZSIsIm5iZiI6MTczMzE1MTAyNS4yNTQwMDAyLCJzdWIiOiI2NzRkYzkzMTc0NzM3NzhiYmQ5YWY3YzUiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.4wKA26LOjYKY3fGsk-zmp0YOvGr7YPfi_IWUf6W7MSE" }, 
-      })
-      .then((response) => setCast(response.data.cast))
-      .catch((error) => console.error("Error fetching cast and crew", error));
-
+    const headers = {
+      Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5M2Q4YTQwMGVlMzFkMzQ4MGYzNjdlMjk2OGMzODhhZSIsIm5iZiI6MTczMzE1MTAyNS4yNTQwMDAyLCJzdWIiOiI2NzRkYzkzMTc0NzM3NzhiYmQ5YWY3YzUiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.4wKA26LOjYKY3fGsk-zmp0YOvGr7YPfi_IWUf6W7MSE"
+    };
+  
     
-    axios
-      .get(`https://api.themoviedb.org/3/movie/${movieId}/images`, {
-        headers: { Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5M2Q4YTQwMGVlMzFkMzQ4MGYzNjdlMjk2OGMzODhhZSIsIm5iZiI6MTczMzE1MTAyNS4yNTQwMDAyLCJzdWIiOiI2NzRkYzkzMTc0NzM3NzhiYmQ5YWY3YzUiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.4wKA26LOjYKY3fGsk-zmp0YOvGr7YPfi_IWUf6W7MSE" }, 
+    Promise.all([
+      axios.get(`https://api.themoviedb.org/3/movie/${movieId}/credits`, { headers }),
+      axios.get(`https://api.themoviedb.org/3/movie/${movieId}/images`, { headers }),
+      axios.get(`https://api.themoviedb.org/3/movie/${movieId}/videos`, { headers }),
+    ])
+      .then(([castRes, photosRes, videosRes]) => {
+        setCast(castRes.data.cast);
+        setPhotos(photosRes.data.backdrops);
+        setVideos(videosRes.data.results);
       })
-      .then((response) => setPhotos(response.data.backdrops))
-      .catch((error) => console.error("Error fetching photos", error));
-
-    
-    axios
-      .get(`https://api.themoviedb.org/3/movie/${movieId}/videos`, {
-        headers: { Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5M2Q4YTQwMGVlMzFkMzQ4MGYzNjdlMjk2OGMzODhhZSIsIm5iZiI6MTczMzE1MTAyNS4yNTQwMDAyLCJzdWIiOiI2NzRkYzkzMTc0NzM3NzhiYmQ5YWY3YzUiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.4wKA26LOjYKY3fGsk-zmp0YOvGr7YPfi_IWUf6W7MSE" }, 
+      .catch((error) => {
+        console.error("Error fetching movie details:", error);
       })
-      .then((response) => setVideos(response.data.results))
-      .catch((error) => console.error("Error fetching videos", error))
-      .finally(() => setIsLoading(false));
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
+  
 
   useEffect(() => {
     if (movieId) {
@@ -132,14 +131,12 @@ const videosToShow = showAll ? videos : videos.slice(0, 3);
             original_title: response.data.title,
             overview: response.data.overview,
             popularity: response.data.popularity,
-            release_date: response.data.releaseDate,
-            vote_average: response.data.voteAverage,
-            backdrop_path: response.data.backdropPath,
             poster_path: response.data.posterPath.replace(
               "https://image.tmdb.org/t/p/original/",
               ""
             ),
-           
+            release_date: response.data.releaseDate,
+            vote_average: response.data.voteAverage,
           };
           setSelectedMovie(tempData);
           setFormData({
@@ -148,8 +145,6 @@ const videosToShow = showAll ? videos : videos.slice(0, 3);
             popularity: response.data.popularity,
             releaseDate: response.data.releaseDate,
             voteAverage: response.data.voteAverage,
-            backdrop_path: response.data.backdropPath,
-            poster_path: response.data.posterPath
           });
           fetchMovieDetails(response.data.tmdbId); 
         })
@@ -184,53 +179,51 @@ const videosToShow = showAll ? videos : videos.slice(0, 3);
     }
   };
 
-
   const handleSave = async () => {
     setIsLoading(true);
     setError("");
-
+  
     const accessToken = localStorage.getItem('accessToken');
     if (!selectedMovie) {
       alert('Please search and select a movie.');
       return;
     }
-
+  
     const data = {
       tmdbId: selectedMovie.id,
       title: formData.title,
       overview: formData.overview,
-      popularity: formData.popularity,
+      popularity: parseFloat(formData.popularity),
       releaseDate: formData.releaseDate,
       voteAverage: parseFloat(formData.voteAverage),
-      backdropPath: `https://image.tmdb.org/t/p/original/${selectedMovie.backdrop_path}`,
-      posterPath: `https://image.tmdb.org/t/p/original/${selectedMovie.poster_path}`,
+      backdropPath: selectedMovie.backdrop_path ? `https://image.tmdb.org/t/p/original/${selectedMovie.backdrop_path}` : "",
+      posterPath: selectedMovie.poster_path ? `https://image.tmdb.org/t/p/original/${selectedMovie.poster_path}` : "",
       isFeatured: 0,
       videos: videos || [],
       casts: cast || [],
       photos: photos || [],
     };
-        
+  
     try {
       const response = await axios({
-        method: movieId ? "patch" : "post",
+        method: movieId ? "patch" : "post", 
         url: movieId ? `/movies/${movieId}` : '/movies',
         data: data,
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      
+  
       alert('Movie saved successfully!');
-      navigate("/main/movies");
+      navigate("/main/movies"); 
     } catch (error) {
-      const errorMessage = error.response?.data?.errors 
-        ? error.response.data.errors.join(", ") 
-        : error.message;
-    
-      console.error("Error saving movie:", errorMessage);
-      alert(`Failed to save movie: ${errorMessage}`);
-    };
+      console.error("Error saving movie:", error.response?.data || error.message);
+      setError("An error occurred while saving the movie. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
+    
 
   const handleUpdate = handleSave;
 
@@ -341,10 +334,12 @@ const videosToShow = showAll ? videos : videos.slice(0, 3);
               <label htmlFor="title">Title</label>
               <input
                 type="text"
+                name="title"
                 id="title"
                 value={formData.title}
                 onChange={handleInputChange}
                 disabled={isLoading}
+                required
               />
             </div>
             <div className="field overview-field">
@@ -352,40 +347,48 @@ const videosToShow = showAll ? videos : videos.slice(0, 3);
               <textarea
                 className="overview"
                 rows={10}
+                name="overview"
                 id="overview"
                 value={formData.overview}
                 onChange={handleInputChange}
                 disabled={isLoading}
+                required
               />
             </div>
             <div className="field popularity-field">
               <label htmlFor="popularity">Popularity</label>
               <input
                 type="number"
+                name="popularity"
                 id="popularity"
                 value={formData.popularity}
                 onChange={handleInputChange}
                 disabled={isLoading}
+                step="0.1"
               />
             </div>
             <div className="field releasedate-field">
               <label htmlFor="releaseDate">Release Date</label>
               <input
                 type="date"
+                name="releaseDate"
                 id="releaseDate"
                 value={formData.releaseDate}
                 onChange={handleInputChange}
                 disabled={isLoading}
+                required
               />
             </div>
             <div className="field voteaverage-field">
               <label htmlFor="voteAverage">Vote Average</label>
               <input
-                type="text"
+                type="number"
+                name="voteAverage"
                 id="voteAverage"
                 value={formData.voteAverage}
                 onChange={handleInputChange}
                 disabled={isLoading}
+                step="0.1"
               />
             </div>
           </div>
@@ -438,13 +441,15 @@ const videosToShow = showAll ? videos : videos.slice(0, 3);
               <div className="photos-header">
                 <h2>Photos</h2>
               </div>
-              <div className="photo-gallery">
-                {photos.slice(0, 4).map((photo) => (
+              <div className="photo-grid">
+                {photos.slice(0, 3).map((photo) => (
                   <img
                     key={photo.file_path}
                     src={`https://image.tmdb.org/t/p/original${photo.file_path}`}
                     alt="Movie Photo"
-                    className="photo-image"
+                    width="180"
+                    height="300"
+                    className="photos-item"
                   />
                 ))}
               </div>

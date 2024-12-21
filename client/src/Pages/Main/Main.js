@@ -49,9 +49,6 @@ function Main() {
                 <a href="/main/movies/home">Home</a>
               </li>
               <li>
-                <a href="/main/movies/home">Genre</a>
-              </li>
-              <li>
                 <a href="/main/movies">Movies</a>
               </li>
             </ul>
