@@ -93,60 +93,83 @@ const videosToShow = showAll ? videos : videos.slice(0, 3);
     setIsLoading(true);
   
 
-    const headers = {
-      Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5M2Q4YTQwMGVlMzFkMzQ4MGYzNjdlMjk2OGMzODhhZSIsIm5iZiI6MTczMzE1MTAyNS4yNTQwMDAyLCJzdWIiOiI2NzRkYzkzMTc0NzM3NzhiYmQ5YWY3YzUiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.4wKA26LOjYKY3fGsk-zmp0YOvGr7YPfi_IWUf6W7MSE"
-    };
+    axios
+    .get(`https://api.themoviedb.org/3/movie/${movieId}/credits`, {
+      headers: { Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5M2Q4YTQwMGVlMzFkMzQ4MGYzNjdlMjk2OGMzODhhZSIsIm5iZiI6MTczMzE1MTAyNS4yNTQwMDAyLCJzdWIiOiI2NzRkYzkzMTc0NzM3NzhiYmQ5YWY3YzUiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.4wKA26LOjYKY3fGsk-zmp0YOvGr7YPfi_IWUf6W7MSE" },
+    })
+    .then((response) => {
+    })
+    .catch((error) => console.error("Error fetching cast and crew", error));
+  
+  
+
+    
+    axios
+    .get(`https://api.themoviedb.org/3/movie/${movieId}/images`, {
+      headers: { Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5M2Q4YTQwMGVlMzFkMzQ4MGYzNjdlMjk2OGMzODhhZSIsIm5iZiI6MTczMzE1MTAyNS4yNTQwMDAyLCJzdWIiOiI2NzRkYzkzMTc0NzM3NzhiYmQ5YWY3YzUiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.4wKA26LOjYKY3fGsk-zmp0YOvGr7YPfi_IWUf6W7MSE" },
+    })
+    .then((response) => {
+    
+      setPhotos(response.data.backdrops);
+    })
+    .catch((error) => console.error("Error fetching photos", error));
   
     
-    Promise.all([
-      axios.get(`https://api.themoviedb.org/3/movie/${movieId}/credits`, { headers }),
-      axios.get(`https://api.themoviedb.org/3/movie/${movieId}/images`, { headers }),
-      axios.get(`https://api.themoviedb.org/3/movie/${movieId}/videos`, { headers }),
-    ])
-      .then(([castRes, photosRes, videosRes]) => {
-        setCast(castRes.data.cast);
-        setPhotos(photosRes.data.backdrops);
-        setVideos(videosRes.data.results);
+      axios
+      .get(`https://api.themoviedb.org/3/movie/${movieId}/videos`, {
+        headers: { Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5M2Q4YTQwMGVlMzFkMzQ4MGYzNjdlMjk2OGMzODhhZSIsIm5iZiI6MTczMzE1MTAyNS4yNTQwMDAyLCJzdWIiOiI2NzRkYzkzMTc0NzM3NzhiYmQ5YWY3YzUiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.4wKA26LOjYKY3fGsk-zmp0YOvGr7YPfi_IWUf6W7MSE" }, 
       })
-      .catch((error) => {
-        console.error("Error fetching movie details:", error);
+      .then((response) => {
+        const limitedVideos = response.data.results.slice(0, 3);
+        setVideos(limitedVideos);
       })
-      .finally(() => {
-        setIsLoading(false);
-      });
+      .catch((error) => console.error("Error fetching videos", error))
+      .finally(() => setIsLoading(false));
+    
   };
-  
 
   useEffect(() => {
     if (movieId) {
       setIsLoading(true);
       setError("");
-
+  
       axios
         .get(`/movies/${movieId}`)
-        .then((response) => {
-          setMovie(response.data);
+        .then(({ data }) => {
+          const {
+            tmdbId,
+            title,
+            overview,
+            popularity,
+            posterPath,
+            releaseDate,
+            voteAverage,
+          } = data;
+  
+          setMovie(data);
           const tempData = {
-            id: response.data.tmdbId,
-            original_title: response.data.title,
-            overview: response.data.overview,
-            popularity: response.data.popularity,
-            poster_path: response.data.posterPath.replace(
+            id: tmdbId,
+            original_title: title,
+            overview,
+            popularity,
+            poster_path: posterPath.replace(
               "https://image.tmdb.org/t/p/original/",
               ""
             ),
-            release_date: response.data.releaseDate,
-            vote_average: response.data.voteAverage,
+            release_date: releaseDate,
+            vote_average: voteAverage,
           };
+  
           setSelectedMovie(tempData);
           setFormData({
-            title: response.data.title,
-            overview: response.data.overview,
-            popularity: response.data.popularity,
-            releaseDate: response.data.releaseDate,
-            voteAverage: response.data.voteAverage,
+            title,
+            overview,
+            popularity,
+            releaseDate,
+            voteAverage,
           });
-          fetchMovieDetails(response.data.tmdbId); 
+  
+          fetchMovieDetails(tmdbId);
         })
         .catch(() => {
           setError("Unable to load movie details. Please try again later.");
@@ -157,6 +180,7 @@ const videosToShow = showAll ? videos : videos.slice(0, 3);
     }
   }, [movieId]);
 
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -164,13 +188,7 @@ const videosToShow = showAll ? videos : videos.slice(0, 3);
       [name]: value,
     }));
   };
-  const handleCastChange = (index, field, value) => {
-    const updatedCast = [...cast];
-    updatedCast[index][field] = value;
-    setCast(updatedCast);
-  };
   
-
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -213,6 +231,11 @@ const videosToShow = showAll ? videos : videos.slice(0, 3);
           Authorization: `Bearer ${accessToken}`,
         },
       });
+      
+      const savedMovieId = response.data.id;
+      await saveVideos(savedMovieId, videos);
+      await savePhotos(savedMovieId, photos);
+
   
       alert('Movie saved successfully!');
       navigate("/main/movies"); 
@@ -223,7 +246,121 @@ const videosToShow = showAll ? videos : videos.slice(0, 3);
       setIsLoading(false);
     }
   };
-    
+
+  const saveVideos = async (movieId, videos) => {
+    if (!videos || videos.length === 0) {
+      console.log("No videos to save.");
+      return;
+    }
+
+    const accessToken = localStorage.getItem("accessToken");
+    const userId = 1; 
+
+    try {
+      const videoPromises = videos.map((video) => {
+        const videoData = {
+          userId: userId,
+          movieId: movieId,
+          url: `https://www.youtube.com/embed/${video.key}`,
+          name: video.name || "Video Title",
+          site: "YouTube",
+          videoKey: video.key,
+          videoType: video.type || "Clip",
+          official: 0,
+        };
+
+        return axios.post("/admin/videos", videoData, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        
+      });
+
+     
+      await Promise.all(videoPromises);
+      console.log("Videos saved successfully");
+    } catch (error) {
+      console.error(
+        "Error saving videos:",
+        error.response?.data || error.message
+      );
+      setError("Failed to save videos. Please try again.");
+    }
+  };
+
+  const savePhotos = async (movieId, photos, userId) => {
+    if (!photos || photos.length === 0) {
+      console.log("No photos to save.");
+      return;
+    }
+  
+    const accessToken = localStorage.getItem("accessToken");
+  
+    try {
+      const photoPromises = photos.map((photo) => {
+        const photoData = {
+          userId: userId,
+          movieId: movieId,
+          url: `https://image.tmdb.org/t/p/original${photo.file_path}`,
+          description: photo.description || "Photo description",
+        };
+  
+        return axios.post("/admin/photos", photoData, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+      });
+  
+      await Promise.all(photoPromises);
+      console.log("Photos saved successfully");
+    } catch (error) {
+      console.error(
+        "Error saving photos:",
+        error.response?.data || error.message
+      );
+      setError("Failed to save photos. Please try again.");
+    }
+  };
+  const saveCast = async (movieId, cast) => {
+    if (!cast || cast.length === 0) {
+      console.log("No cast to save.");
+      return;
+    }
+  
+    const accessToken = localStorage.getItem("accessToken");
+    const userId = 1; 
+  
+    try {
+      const castPromises = cast.map((member) => {
+        const castData = {
+          userId: userId,
+          movieId: movieId,
+          name: member.name,
+          character: member.character,
+          profilePath: member.profile_path
+            ? `https://image.tmdb.org/t/p/original${member.profile_path}`
+            : null,
+          castId: member.cast_id,
+          order: member.order,
+        };
+  
+        return axios.post("/admin/cast", castData, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+      });
+  
+      await Promise.all(castPromises);
+      console.log("Cast saved successfully");
+    } catch (error) {
+      console.error("Error saving cast:", error.response?.data || error.message);
+      setError("Failed to save cast. Please try again.");
+    }
+  };
+  
 
   const handleUpdate = handleSave;
 
